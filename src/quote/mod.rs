@@ -22,12 +22,13 @@ impl std::fmt::Display for Quote {
         if let Some(work) = &self.work {
             write!(f, "From work: {}\n", work)?;
         }
-
+    
+        write!(f, "Categories: ")?;
         for c in &self.categories {
-            write!(f, "Category: {}\n", c.to_string())?;
+            write!(f, "{} ", c.to_string())?;
         }
 
-        write!(f, "")
+        write!(f, "\n")
     }
 }
 
