@@ -37,9 +37,11 @@ fn get_option(prompt: &str, s: &mut String) {
 async fn main() {
     dotenv::dotenv().ok();
     let api_key = env::var("API_KEY").expect("API_KEY not found!");
-    let client = Client::new();
     let mut headers = HeaderMap::new();
     headers.insert("X-Api-Key", HeaderValue::from_str(&api_key).unwrap());
+    let client = Client::builder()
+        .default_headers(headers)
+        .build().unwrap();
     let mut options = QuoteSearchOptions::default();
 
     loop {
@@ -94,7 +96,7 @@ async fn main() {
                 options = QuoteSearchOptions::default();
             },
             6 => {
-                let quote = match get_quote(client.clone(), headers.clone(), options.clone()).await {
+                let quote = match get_quote(&client, &options).await {
                     Ok(q) => q,
                     Err(e) => {
                         println!("Error! {e}");
@@ -105,7 +107,7 @@ async fn main() {
             },
             7 => {
                 println!("Here is the quote of the day!");
-                let qotd = match get_quote_of_the_day(client.clone(), headers.clone()).await {
+                let qotd = match get_quote_of_the_day(&client).await {
                     Ok(q) => q,
                     Err(e) => {
                         println!("Error! {e}");

@@ -1,12 +1,12 @@
 use crate::{QuoteSearchOptions, QuoteResponse, Quote};
-use reqwest::{Client, header::HeaderMap};
+use reqwest::Client;
 
 const BASE_URL: &'static str = "https://api.api-ninjas.com/v2/randomquotes";
 const QOTD_URL: &'static str = "https://api.api-ninjas.com/v2/quoteoftheday";
 
-pub fn build_url(options: QuoteSearchOptions) -> String {
+pub fn build_url(options: &QuoteSearchOptions) -> String {
     let mut url = format!("{BASE_URL}?");
-    if let Some(categories) = options.categories {
+    if let Some(categories) = &options.categories {
         url.push_str("categories=");
         for c in categories {
             let s = c.to_string();
@@ -18,7 +18,7 @@ pub fn build_url(options: QuoteSearchOptions) -> String {
         url.push('&');
     }
 
-    if let Some(excluded) = options.exclude_categories {
+    if let Some(excluded) = &options.exclude_categories {
         url.push_str("exclude_categories=");
         for c in excluded {
             let s = c.to_string();
@@ -30,13 +30,13 @@ pub fn build_url(options: QuoteSearchOptions) -> String {
         url.push('&');
     }
 
-    if let Some(mut author) = options.author {
-        author = author.replace(" ", "%20");
+    if let Some(author) = &options.author {
+        let author = author.replace(" ", "%20");
         url.push_str(&format!("author={author}&"));
     }
 
-    if let Some(mut work) = options.work {
-        work = work.replace(" ", "%20");
+    if let Some(work) = &options.work {
+        let work = work.replace(" ", "%20");
         url.push_str(&format!("work={work}&"));
     }
 
@@ -44,11 +44,10 @@ pub fn build_url(options: QuoteSearchOptions) -> String {
     url
 }
 
-pub async fn get_quote(client: Client, headers: HeaderMap, options: QuoteSearchOptions) -> Result<Quote, String> {
+pub async fn get_quote(client: &Client, options: &QuoteSearchOptions) -> Result<Quote, String> {
     let url = build_url(options);
 
     let resp: Vec<QuoteResponse> = client.get(url)
-        .headers(headers)
         .send()
         .await
         .map_err(|_| "Failed to send".to_string())?
@@ -60,9 +59,8 @@ pub async fn get_quote(client: Client, headers: HeaderMap, options: QuoteSearchO
     Ok(Quote::from(first))
 }
 
-pub async fn get_quote_of_the_day(client: Client, headers: HeaderMap) -> Result<Quote, String> {
+pub async fn get_quote_of_the_day(client: &Client) -> Result<Quote, String> {
     let resp: Vec<QuoteResponse> = client.get(QOTD_URL)
-        .headers(headers)
         .send()
         .await
         .map_err(|_| "Failed to send".to_string())?
