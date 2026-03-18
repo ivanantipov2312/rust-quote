@@ -4,7 +4,7 @@ use std::{env, str::FromStr};
 use reqwest::{Client, header::{HeaderMap, HeaderValue}};
 use dotenv;
 
-use quote::{Quote, options::QuoteSearchOptions, response::QuoteResponse, category::Category, get::get_quotes};
+use quote::{Quote, options::QuoteSearchOptions, response::QuoteResponse, category::Category, get::{get_quote, get_quote_of_the_day}};
 
 pub fn print_menu() {
     println!("1. Choose an author");
@@ -13,7 +13,8 @@ pub fn print_menu() {
     println!("4. Choose work");
     println!("5. Discard all options");
     println!("6. Search");
-    println!("7. Quit");
+    println!("7. Get quote of the day");
+    println!("8. Quit");
 }
 
 fn get_option(prompt: &str, s: &mut String) {
@@ -93,18 +94,27 @@ async fn main() {
                 options = QuoteSearchOptions::default();
             },
             6 => {
-                let quotes = match get_quotes(client.clone(), headers.clone(), options.clone()).await {
+                let quote = match get_quote(client.clone(), headers.clone(), options.clone()).await {
                     Ok(q) => q,
                     Err(e) => {
                         println!("Error! {e}");
                         continue;
                     }
                 };
-                for q in quotes {
-                    println!("{q}");
-                }
+                println!("{quote}");
             },
             7 => {
+                println!("Here is the quote of the day!");
+                let qotd = match get_quote_of_the_day(client.clone(), headers.clone()).await {
+                    Ok(q) => q,
+                    Err(e) => {
+                        println!("Error! {e}");
+                        continue;
+                    }
+                };
+                println!("{qotd}");
+            }
+            8 => {
                 println!("Goodbye, user!");
                 break;
             }

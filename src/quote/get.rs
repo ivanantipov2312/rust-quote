@@ -2,6 +2,7 @@ use crate::{QuoteSearchOptions, QuoteResponse, Quote};
 use reqwest::{Client, header::HeaderMap};
 
 const BASE_URL: &'static str = "https://api.api-ninjas.com/v2/randomquotes";
+const QOTD_URL: &'static str = "https://api.api-ninjas.com/v2/quoteoftheday";
 
 pub fn build_url(options: QuoteSearchOptions) -> String {
     let mut url = format!("{BASE_URL}?");
@@ -43,7 +44,7 @@ pub fn build_url(options: QuoteSearchOptions) -> String {
     url
 }
 
-pub async fn get_quotes(client: Client, headers: HeaderMap, options: QuoteSearchOptions) -> Result<Vec<Quote>, String> {
+pub async fn get_quote(client: Client, headers: HeaderMap, options: QuoteSearchOptions) -> Result<Quote, String> {
     let url = build_url(options);
 
     let resp: Vec<QuoteResponse> = client.get(url)
@@ -55,5 +56,20 @@ pub async fn get_quotes(client: Client, headers: HeaderMap, options: QuoteSearch
         .await
         .map_err(|_| "Failed to get response".to_string())?;
 
-    Ok(resp.into_iter().map(|q| q.into()).collect())
+    let first = resp.into_iter().next().ok_or_else(|| "No quotes found!".to_string())?;
+    Ok(Quote::from(first))
+}
+
+pub async fn get_quote_of_the_day(client: Client, headers: HeaderMap) -> Result<Quote, String> {
+    let resp: Vec<QuoteResponse> = client.get(QOTD_URL)
+        .headers(headers)
+        .send()
+        .await
+        .map_err(|_| "Failed to send".to_string())?
+        .json()
+        .await
+        .map_err(|_| "Failed to get response".to_string())?;
+
+    let first = resp.into_iter().next().ok_or_else(|| "No quotes found!".to_string())?;
+    Ok(Quote::from(first))
 }
