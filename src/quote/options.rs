@@ -1,12 +1,12 @@
 use crate::quote::category::Category;
 
-const BASE_URL: &'static str = "https://api.api-ninjas.com/v2/quotes";
+const BASE_URL: &'static str = "https://api.api-ninjas.com/v2/randomquotes";
 
 pub struct QuoteSearchOptions {
     pub categories: Option<Vec<Category>>,
     pub exclude_categories: Option<Vec<Category>>,
     pub author: Option<String>,
-    pub work: Option<String>
+    pub work: Option<String>,
 }
 
 impl QuoteSearchOptions {
