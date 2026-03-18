@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Copy, Deserialize)]
 pub enum Category {
     Wisdom,
     Philosophy,

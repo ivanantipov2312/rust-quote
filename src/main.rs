@@ -4,20 +4,7 @@ use std::{env, str::FromStr};
 use reqwest::{Client, header::{HeaderMap, HeaderValue}};
 use dotenv;
 
-use quote::{Quote, options::QuoteSearchOptions, response::QuoteResponse, category::Category};
-
-pub async fn get_quotes(client: Client, headers: HeaderMap, url: &str) -> Result<Vec<Quote>, String> {
-    let resp: Vec<QuoteResponse> = client.get(url)
-        .headers(headers)
-        .send()
-        .await
-        .map_err(|_| "Failed to send".to_string())?
-        .json()
-        .await
-        .map_err(|_| "Failed to get response".to_string())?;
-
-    Ok(resp.into_iter().map(|q| q.into()).collect())
-}
+use quote::{Quote, options::QuoteSearchOptions, response::QuoteResponse, category::Category, get::get_quotes};
 
 pub fn print_menu() {
     println!("1. Choose an author");
@@ -84,7 +71,6 @@ async fn main() {
                     .map(|c| Category::from_str(c.trim()))
                     .filter_map(Result::ok)
                     .collect();
-                println!("{categories:?}");
                 options.categories = Some(categories);
             },
             3 => {
@@ -95,7 +81,6 @@ async fn main() {
                     .map(|c| Category::from_str(c.trim()))
                     .filter_map(Result::ok)
                     .collect();
-                println!("{categories:?}");
                 options.exclude_categories = Some(categories);
             },
             4 => {
@@ -104,11 +89,11 @@ async fn main() {
                 options.work = Some(work);
             },
             5 => {
+                println!("Discarding options!");
                 options = QuoteSearchOptions::default();
             },
             6 => {
-                let url = options.build_url();
-                let quotes = match get_quotes(client.clone(), headers.clone(), &url).await {
+                let quotes = match get_quotes(client.clone(), headers.clone(), options.clone()).await {
                     Ok(q) => q,
                     Err(e) => {
                         println!("Error! {e}");

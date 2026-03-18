@@ -1,13 +1,13 @@
 pub mod options;
 pub mod category;
 pub mod response;
+pub mod get;
 
 use std::str::FromStr;
 
 use category::Category;
 use response::QuoteResponse;
 
-#[derive(Debug)]
 pub struct Quote {
     quote: String,
     author: String,
