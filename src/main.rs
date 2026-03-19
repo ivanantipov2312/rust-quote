@@ -96,7 +96,15 @@ async fn main() {
                 current_quote = Some(qotd);
             },
             8 => {
-                if let Err(e) = write_quote_to_json(&current_quote) {
+                let q = match current_quote.take() {
+                    Some(q) => q,
+                    None => {
+                        println!("Error! Nothing to write!");
+                        continue;
+                    }
+                };
+
+                if let Err(e) = write_quote_to_json(q) {
                     println!("Error writing! {e}");
                     continue;
                 }

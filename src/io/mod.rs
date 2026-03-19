@@ -1,14 +1,8 @@
 use std::fs::OpenOptions;
-use std::io::{Error as IoError, ErrorKind, Write};
+use std::io::Write;
 use crate::{Quote, QuoteResponse};
 
-pub fn write_quote_to_json(quote: &Option<Quote>) -> Result<(), Box<dyn std::error::Error>> {
-    let quote = if let Some(q) = quote {
-        q
-    } else {
-        return Err(Box::new(IoError::new(ErrorKind::Other, "Nothing to write!")));
-    };
-
+pub fn write_quote_to_json(quote: Quote) -> Result<(), Box<dyn std::error::Error>> {
     let mut filename = String::new();
     get_option("Enter filename:", &mut filename);
     println!("Saving to {filename}...");
@@ -22,6 +16,7 @@ pub fn write_quote_to_json(quote: &Option<Quote>) -> Result<(), Box<dyn std::err
     let formatted = QuoteResponse::from(quote);
     let json = serde_json::to_string_pretty(&formatted)?;
     file.write_all(json.as_bytes())?;
+    writeln!(file, "")?;
     
     Ok(())
 }
