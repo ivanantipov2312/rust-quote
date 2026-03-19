@@ -1,37 +1,12 @@
 mod quote;
+mod io;
 
 use std::{env, str::FromStr};
 use reqwest::{Client, header::{HeaderMap, HeaderValue}};
 use dotenv;
 
 use quote::{Quote, options::QuoteSearchOptions, response::QuoteResponse, category::Category, get::{get_quote, get_quote_of_the_day}};
-
-pub fn print_menu() {
-    println!("1. Choose an author");
-    println!("2. Choose category or categories");
-    println!("3. Exclude categories");
-    println!("4. Choose work");
-    println!("5. Discard all options");
-    println!("6. Search");
-    println!("7. Get quote of the day");
-    println!("8. Quit");
-}
-
-fn get_option(prompt: &str, s: &mut String) {
-    loop {
-        println!("{prompt}");
-        if let Err(e) = std::io::stdin().read_line(s) {
-            println!("{e}");
-            continue;
-        } else if s == "\n" {
-            println!("Empty input is not allowed!");
-            s.clear();
-            continue;
-        } {
-            break;
-        }
-    }
-}
+use io::{get_option, print_menu, write_quote_to_json};
 
 #[tokio::main]
 async fn main() {
@@ -43,6 +18,8 @@ async fn main() {
         .default_headers(headers)
         .build().unwrap();
     let mut options = QuoteSearchOptions::default();
+
+    let mut current_quote: Option<Quote> = None;
 
     loop {
         print_menu();
@@ -104,6 +81,7 @@ async fn main() {
                     }
                 };
                 println!("{quote}");
+                current_quote = Some(quote);
             },
             7 => {
                 println!("Here is the quote of the day!");
@@ -115,8 +93,15 @@ async fn main() {
                     }
                 };
                 println!("{qotd}");
-            }
+                current_quote = Some(qotd);
+            },
             8 => {
+                if let Err(e) = write_quote_to_json(&current_quote) {
+                    println!("Error writing! {e}");
+                    continue;
+                }
+            }
+            9 => {
                 println!("Goodbye, user!");
                 break;
             }
