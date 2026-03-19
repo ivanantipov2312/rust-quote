@@ -8,6 +8,7 @@ use std::str::FromStr;
 use category::Category;
 use response::QuoteResponse;
 
+// Actual quote for storage and type checking reason
 pub struct Quote {
     quote: String,
     author: String,
@@ -34,12 +35,14 @@ impl std::fmt::Display for Quote {
 
 impl From<QuoteResponse> for Quote {
     fn from(value: QuoteResponse) -> Self {
+        // Convert from String categories to Category
         let categories: Vec<_> = value.categories
             .iter()
             .map(|c| Category::from_str(c.as_str()))
-            .filter_map(Result::ok)
+            .filter_map(Result::ok) // filter out everything that is not ok
             .collect();
 
+        // Work field is always present in the API, so if it's empty set None
         let work = if !value.work.is_empty() {
             Some(value.work)
         } else {

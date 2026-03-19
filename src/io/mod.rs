@@ -39,12 +39,12 @@ pub fn get_option(prompt: &str, s: &mut String) {
         if let Err(e) = std::io::stdin().read_line(s) {
             println!("{e}");
             continue;
-        } else if s.trim() == "" {
+        } else if s.trim() == "" { // Empty input
             println!("Empty input is not allowed!");
             s.clear();
             continue;
         } else {
-            *s = s.trim().to_string();
+            *s = s.trim().to_string(); // Trim the string and store it back to s
             break;
         }
     }

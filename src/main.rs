@@ -38,12 +38,12 @@ async fn main() {
         };
 
         match opt {
-            1 => {
+            1 => { // Author
                 let mut author = String::new();
                 get_option("Enter author's name", &mut author);
                 options.author = Some(author);
             },
-            2 => {
+            2 => { // Category
                 let mut categories = String::new();
                 get_option("Enter category or categories as a comma separated list", &mut categories);
                 let categories: Vec<_> = categories.trim().split(',').collect();
@@ -53,7 +53,7 @@ async fn main() {
                     .collect();
                 options.categories = Some(categories);
             },
-            3 => {
+            3 => { // Exclude category
                 let mut excluded_categories = String::new();
                 get_option("Enter category or categories as a comma separated list", &mut excluded_categories);
                 let categories: Vec<_> = excluded_categories.trim().split(',').collect();
@@ -63,16 +63,16 @@ async fn main() {
                     .collect();
                 options.exclude_categories = Some(categories);
             },
-            4 => {
+            4 => { // Work
                 let mut work = String::new();
                 get_option("Enter work's name", &mut work);
                 options.work = Some(work);
             },
-            5 => {
+            5 => { // Discard
                 println!("Discarding options!");
                 options = QuoteSearchOptions::default();
             },
-            6 => {
+            6 => { // Search with options
                 let quote = match get_quote(&client, &options).await {
                     Ok(q) => q,
                     Err(e) => {
@@ -83,7 +83,7 @@ async fn main() {
                 println!("{quote}");
                 current_quote = Some(quote);
             },
-            7 => {
+            7 => { // QOTD
                 println!("Here is the quote of the day!");
                 let qotd = match get_quote_of_the_day(&client).await {
                     Ok(q) => q,
@@ -95,7 +95,7 @@ async fn main() {
                 println!("{qotd}");
                 current_quote = Some(qotd);
             },
-            8 => {
+            8 => { // Save quote to json
                 let q = match current_quote.take() {
                     Some(q) => q,
                     None => {
@@ -109,7 +109,7 @@ async fn main() {
                     continue;
                 }
             }
-            9 => {
+            9 => { // Quit
                 println!("Goodbye, user!");
                 break;
             }
